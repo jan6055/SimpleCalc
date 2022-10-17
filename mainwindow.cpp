@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "expr_eval.h"
 #include "./ui_mainwindow.h"
+#include <algorithm>
 #include <QDebug>
 #include <QKeyEvent>
 
@@ -134,8 +135,12 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         //Ctrl + D 向下取整
         else if(key == Qt::Key_D) {
             ui->round_down->click();
+        //Ctrl + A 设置num_line的可编辑性
         } else if(key == Qt::Key_A) {
             ui->action_edit_able_enable->trigger();
+        //Ctrl + T 转为后缀表达式
+        } else if (key == Qt::Key_T) {
+            ui->action_to_postfix->trigger();
         }
     } else if (event->modifiers() == Qt::ShiftModifier) {
         //"(" and ")"
@@ -202,6 +207,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 void MainWindow::on_action_to_postfix_triggered()
 {
     auto expr = ui->num_line->text();
+    m_history.push_back(expr);
+    ++m_his_idx;
     if(!is_postfix(expr)) {
         auto postfix = infix_to_postfix(expr);
         ui->num_line->setText(postfix);
@@ -216,10 +223,34 @@ void MainWindow::on_action_edit_able_enable_triggered()
 }
 
 
+void MainWindow::on_action_his_clear_triggered()
+{
+    m_history.clear();
+    m_his_idx = 0;
+}
+
+void MainWindow::on_action_his_union_triggered()
+{
+    QStringList new_history;
+    new_history.reserve(m_history.size());
+    for(const auto & his : m_history) {
+        if(!new_history.contains(his)) {
+            new_history.emplaceBack(std::move(his));
+        }
+    }
+    m_history = std::move(new_history);
+    m_his_idx = m_history.size()-1;
+}
 
 
+//新建一个窗口列出所有的历史记录
+void MainWindow::on_action_history_triggered()
+{
+
+}
 
 
+/*--------------------------*/
 CHAR_BUTTON_CLICKED(dot,.)
 CHAR_BUTTON_CLICKED(add,+)
 CHAR_BUTTON_CLICKED(sub,-)

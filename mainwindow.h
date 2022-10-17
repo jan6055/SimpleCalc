@@ -45,6 +45,12 @@ private slots:
 
     void on_action_edit_able_enable_triggered();
 
+    void on_action_his_clear_triggered();
+
+    void on_action_his_union_triggered();
+
+    void on_action_history_triggered();
+
 private:
     Ui::MainWindow *ui;
     QStringList m_history;
