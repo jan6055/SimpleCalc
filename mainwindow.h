@@ -49,7 +49,7 @@ private slots:
 
     void on_action_his_union_triggered();
 
-    void on_action_history_triggered();
+    void on_action_history_list_triggered();
 
 private:
     Ui::MainWindow *ui;

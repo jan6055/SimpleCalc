@@ -84,18 +84,18 @@ void test_is_postfix() {
     cout << "test_is_postfix: OK" << endl;
 }
 
-void test_bracket_match() {
-    assert(bracket_match("(1+2)"));
-    assert(!bracket_match("(1+2)("));
-    assert(!bracket_match("())"));
-    assert(!bracket_match("(()"));
-    assert(bracket_match("(1+2)*(3+4)"));
-    assert(bracket_match("(1+2)*(3*5+6)+()"));
-    cout << "test_bracket_match: OK" << endl;
-}
+//void test_bracket_match() {
+//    assert(bracket_match("(1+2)"));
+//    assert(!bracket_match("(1+2)("));
+//    assert(!bracket_match("())"));
+//    assert(!bracket_match("(()"));
+//    assert(bracket_match("(1+2)*(3+4)"));
+//    assert(bracket_match("(1+2)*(3*5+6)+()"));
+//    cout << "test_bracket_match: OK" << endl;
+//}
 void test_all() {
     test_infix_eval();
-    test_bracket_match();
+//    test_bracket_match();
 }
 //#define DEBUG
 int main(int argc, char *argv[])

@@ -153,15 +153,32 @@ bool token_is_num(const QString &token)
     return true;
 }
 
+bool bracket_match(const QStringList &token_list)
+{
+    std::stack<QString> s;
+    for(const auto & token : token_list) {
+        if(token == "(") {
+            s.push(token);
+        } else if(token == ")") {
+            s.pop();
+        }
+    }
+    return s.empty();
+}
+
 bool bracket_match(const QString &expr)
 {
     std::stack<QChar> s;
     for(const auto & ch : expr) {
         if(ch == '(') {
             s.push(ch);
-        } else if(ch == ')') {
+        } else if (ch == '(') {
             s.pop();
         }
     }
     return s.empty();
 }
+
+bracket_not_match::bracket_not_match()
+    : std::logic_error("Error: bracket is not matched")
+{ }

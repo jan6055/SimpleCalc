@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>670</width>
-    <height>390</height>
+    <width>545</width>
+    <height>476</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -310,7 +310,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>670</width>
+     <width>545</width>
      <height>17</height>
     </rect>
    </property>
@@ -321,7 +321,7 @@
     <addaction name="action_to_postfix"/>
     <addaction name="action_edit_able_enable"/>
     <addaction name="separator"/>
-    <addaction name="action_history"/>
+    <addaction name="action_history_list"/>
     <addaction name="action_his_clear"/>
     <addaction name="action_his_union"/>
     <addaction name="action_history_export"/>
@@ -349,9 +349,9 @@
     <string>History Union</string>
    </property>
   </action>
-  <action name="action_history">
+  <action name="action_history_list">
    <property name="text">
-    <string>History</string>
+    <string>History List</string>
    </property>
   </action>
   <action name="action_history_export">

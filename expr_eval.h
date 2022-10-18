@@ -4,6 +4,27 @@
 #include <vector>
 #include <stack>
 #include <QStringList>
+#include <exception>
+
+class div_zero : public std::invalid_argument {
+public:
+    using std::invalid_argument::invalid_argument;
+};
+
+class bracket_not_match : public std::logic_error {
+public:
+    using std::logic_error::logic_error;
+    bracket_not_match();
+};
+
+class no_operand : public std::logic_error {
+public:
+    using std::logic_error::logic_error;
+};
+//括号是否匹配，适用于token_list
+bool bracket_match(const QStringList & token_list);
+//括号是否匹配，适用于expr: QString
+bool bracket_match(const QString & expr);
 
 // 中缀表达式转换为后缀表达式
 QString infix_to_postfix(const QString & expr);
@@ -35,6 +56,7 @@ T postfix_eval_helper(const QStringList & expr)
     }
     return num_stack.top();
 }
+
 // 将表达式拆分为QStringList
 QStringList split_expr(const QString & expr);
 
@@ -60,6 +82,9 @@ T postfix_eval(const QString & expr)
 //中缀表达式求值
 template <typename T>
 T infix_eval(const QString & expr) {
+    if(!bracket_match(expr)) {
+        throw bracket_not_match();
+    }
     auto token_list = split_expr(expr);
     return postfix_eval_helper<T>(infix_to_postfix_helper(token_list));
 }
@@ -79,7 +104,7 @@ T do_cacl(const T & left_num, const T & right_num, const QString & op) {
         return left_num * right_num;
     } else {
         if(right_num == 0) {
-            throw "divide zero";
+            throw div_zero("Error: " + QString::number(left_num).toStdString() + "/0");
         } else {
             return left_num / right_num;
         }
@@ -89,7 +114,6 @@ T do_cacl(const T & left_num, const T & right_num, const QString & op) {
 bool is_postfix(const QString & expr);
 bool is_postfix_helper(const QStringList & token_list);
 bool token_is_num(const QString & token);
-bool bracket_match(const QString & expr);
 
 
 #endif // EXPR_EVAL_H

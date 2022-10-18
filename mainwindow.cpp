@@ -4,8 +4,11 @@
 #include <algorithm>
 #include <QDebug>
 #include <QKeyEvent>
+#include <QListView>
+#include <QStandardItem>
+#include <QStringListModel>
 
-const QString DEFALUT_FONT = "JetBrains Mono";
+const QString DEFALUT_FONT = "Microsoft YaHei UI";
 
 #define NUM_BUTTON_CLICKED(X) 				\
 void MainWindow::on_num_##X##_clicked() { 	\
@@ -30,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->statusbar->showMessage("Welcome To Cacl!");
     ui->num_line->setAlignment(Qt::AlignRight);
     ui->num_line->setEnabled(false);
+    resize(0,0); //使窗口尽可能的小
+//    setFixedSize(this->width(),this->height());
 }
 
 MainWindow::~MainWindow()
@@ -48,35 +53,37 @@ void MainWindow::on_enter_clicked()
     }
     auto p = judged_expr_type(expr);
     //结果为浮点数
-    if(p) {
-        qDebug() << "into p";
-        double ans;
-        if(is_postfix(expr)) {
-            qDebug() << "into is_postfix";
-            ans = postfix_eval<double>(expr);
+    try {
+        if(p) {
+            double ans;
+            if(is_postfix(expr)) {
+                ans = postfix_eval<double>(expr);
+            } else {
+                ans = infix_eval<double>(expr);
+            }
+            ui->num_line->setText(QString::number(ans));
+        //结果为整数
         } else {
-            qDebug() << "into not is_postfix";
-            ans = infix_eval<double>(expr);
+            int ans;
+            if(is_postfix(expr)) {
+                ans = postfix_eval<int>(expr);
+            } else {
+                ans = infix_eval<int>(expr);
+            }
+            ui->num_line->setText(QString::number(ans));
         }
-        ui->num_line->setText(QString::number(ans));
-    //结果为整数
-    } else {
-        qDebug() << "into not p";
-        int ans;
-        if(is_postfix(expr)) {
-            qDebug() << "into is_postfix";
-            ans = postfix_eval<int>(expr);
-        } else {
-            qDebug() << "into not is_postfix";
-            ans = infix_eval<int>(expr);
-        }
-        ui->num_line->setText(QString::number(ans));
+    } catch (const std::exception & error) {
+        ui->statusbar->showMessage(error.what());
+        ui->clear->click();
+        return;
     }
+
     //状态栏显示被计算的表达式
     ui->statusbar->showMessage("expression: " + expr);
     //将表达式录入到历史记录中
     m_history.push_back(expr);
     m_his_idx = m_history.size()-1;
+
 }
 
 
@@ -127,6 +134,12 @@ void MainWindow::set_keybord_font(const QString &font)
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     auto key = event->key();
+    qDebug() << event->key();
+    if(key == Qt::Key_ParenLeft) {
+        ui->open_paren->click();
+    } else if (key == Qt::Key_ParenRight) {
+        ui->close_paren->click();
+    }
     if(event->modifiers() == Qt::ControlModifier) {
         //Ctrl + C 清除
         if(key == Qt::Key_C) {
@@ -174,7 +187,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             ui->mul->click();
         } else if (key == Qt::Key_Slash) {
             ui->div->click();
-        } else if (key == Qt::Key_Enter) {
+        } else if (key == Qt::Key_Enter //数字区Enter
+                   || key == Qt::Key_Enter - 1/*键盘区Enter*/) {
             ui->enter->click();
         } else if (key == Qt::Key_Backspace) {
             auto s = ui->num_line->text();
@@ -198,6 +212,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 }
                 ui->num_line->setText(m_history[m_his_idx]);
             }
+        } else if(key == Qt::Key_Period) {
+            ui->dot->click();
         }
     }
     QMainWindow::keyPressEvent(event);
@@ -242,15 +258,29 @@ void MainWindow::on_action_his_union_triggered()
     m_his_idx = m_history.size()-1;
 }
 
-
-//新建一个窗口列出所有的历史记录
-void MainWindow::on_action_history_triggered()
+void MainWindow::on_action_history_list_triggered()
 {
-
+    qDebug() << "history list";
+    auto w = new QWidget();
+    auto model = new QStringListModel(w);
+    model->setStringList(m_history);
+    auto his_list = new QListView(w);
+    his_list->setModel(model);
+    his_list->resize(400,400);
+    w->show();
 }
 
 
+
+
+
+
+
+
+
 /*--------------------------*/
+//宏函数链接每个按钮
+//使用on_widgetName_Singal的链接方式
 CHAR_BUTTON_CLICKED(dot,.)
 CHAR_BUTTON_CLICKED(add,+)
 CHAR_BUTTON_CLICKED(sub,-)
